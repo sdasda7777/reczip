@@ -49,7 +49,7 @@ function UnzipFiles{
 if ( $Paths.Length -eq 0 )
 {
 	$execname = $MyInvocation.MyCommand.Name;
-	echo "Usage: $execname $execname [-Pass Password] -Paths FileOrRootFolder[, FileOrRootFolder2...]";
+	echo "Usage: $execname [-Pass Password] -Paths FileOrRootFolder[, FileOrRootFolder2...]";
 	exit 1;
 }
 
