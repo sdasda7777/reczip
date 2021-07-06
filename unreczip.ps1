@@ -1,7 +1,15 @@
+<#
+.SYNOPSIS
+Recursively goes through given folders and unarchives every file using 7-Zip using supplied password
+#>
+
+Param(
+    [string]$Pass = "",
+	[string[]]$Paths
+)
+
 #If your 7-Zip is installed elsewhere, change the path below
 Set-Alias 7zip "C:\Program Files\7-Zip\7z.exe"
-
-$root = $args[0]
 
 function UnzipFiles{
 	param (
@@ -38,11 +46,14 @@ function UnzipFiles{
 	}
 }
 
-if ( $root -like "" )
+if ( $Paths.Length -eq 0 )
 {
 	$execname = $MyInvocation.MyCommand.Name;
-	echo "Usage: $execname FileOrRootFolder [Password]";
+	echo "Usage: $execname $execname [-Pass Password] -Paths FileOrRootFolder[, FileOrRootFolder2...]";
 	exit 1;
 }
 
-UnzipFiles -Path $root -Pass $args[1]
+ForEach ($Path in $Paths)
+{ 
+	UnzipFiles -Path $Path -Pass $Pass
+}

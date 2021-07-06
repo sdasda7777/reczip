@@ -1,7 +1,15 @@
+<#
+.SYNOPSIS
+Recursively goes through given folders and archives every file individually using 7-Zip using supplied password
+#>
+
+Param(
+    [string]$Pass = "",
+	[string[]]$Paths
+)
+
 #If your 7-Zip is installed elsewhere, change the path below
 Set-Alias 7zip "C:\Program Files\7-Zip\7z.exe"
-
-$root = $args[0]
 
 function ZipFiles{
 	param (
@@ -9,7 +17,7 @@ function ZipFiles{
 		$Pass
 	)
 
-	$target = get-item $Path
+	$target = Get-Item $Path
 	if ( $target.PSIsContainer )
 	{	
 		$filesinside = Get-ChildItem -Path $Path
@@ -28,17 +36,23 @@ function ZipFiles{
 		{
 			7zip a "$Path.7z" $Path -p"$Pass" | Out-Null
 		}
-
-		#The line below is what you want to comment (add a # before it) to make the files not delete automatically
-		Remove-Item -Path $Path
+		
+		if( $? -eq $True )
+		{
+			#The line below is what you want to comment (add a # before it) to make the files not delete automatically
+			Remove-Item -Path $Path
+		}
 	}
 }
 
-if ( $root -like "" )
+if ( $Paths.Length -eq 0 )
 {
 	$execname = $MyInvocation.MyCommand.Name;
-	echo "Usage: $execname FileOrRootFolder [Password]";
+	echo "Usage: $execname [-Pass Password] -Paths FileOrRootFolder[, FileOrRootFolder2...]";
 	exit 1;
 }
 
-ZipFiles -Path $root -Pass $args[1]
+ForEach ($Path in $Paths)
+{ 
+	ZipFiles -Path $Path -Pass $Pass
+}
